@@ -1,7 +1,8 @@
 from mytoken import token
-
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
+from glob import glob
 
+import random
 
 # создаём сущность mybot, которая будет получать сообщения
 mybot = Updater(token, use_context=True) 
@@ -25,18 +26,35 @@ def talk_to_me(update, context):
     else:
         update.message.reply_text(f'Ты написал: {user_text}!')
     
-def cat_img(update, context):
-    cats = glob('img\cat*')
-    cat = random.choice(cats)
-    id = update.effective_chat.id
-    ph = open(cat, 'rb')
-    context.bot.send_photo(chat_id=id, photo=ph)
-    ph.close()
+def img(update, context):
+    if not context.args:
+        imgs = glob('img\*')
+        if imgs:    
+            img = random.choice(imgs)
+            id = update.effective_chat.id
+            ph = open(img, 'rb')
+            context.bot.send_photo(chat_id=id, photo=ph)
+            ph.close()
+        else:
+            update.message.reply_text(f'Нужно найти вора картинок')
+        return
+    for elem in context.args:
+        imgs = glob(f'img\*{elem}*')
+        if imgs:    
+            img = random.choice(imgs)
+            id = update.effective_chat.id
+            ph = open(img, 'rb')
+            context.bot.send_photo(chat_id=id, photo=ph)
+            ph.close()
+            break
+    else:
+        update.message.reply_text(f'Таких картинок нету')
 
 
 
 mybot.dispatcher.add_handler(CommandHandler('start', greet))
 mybot.dispatcher.add_handler(CommandHandler('help', info))
+mybot.dispatcher.add_handler(CommandHandler('img', img))
 # связываем функцию talk_to_me с исключительно текстовыми сообщениями
 mybot.dispatcher.add_handler(MessageHandler(Filters.text, talk_to_me))
 print('Я запустился!')
