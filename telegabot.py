@@ -12,15 +12,14 @@ mybot = Updater(token, use_context=True)
 
 ne_alphavit = 'qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM'
 smiles = [':smile:', ':smiley:', ':laughing:', ':hugging_face:', ':zany_face:']
-yasherica_smiles = [':turtle:', ':lizard:', ':crocodile:', ':snake:', ':sauropod:', ':t-rex:']
+yasherica_smiles = [':turtle:', ':lizard:', ':crocodile:', ':snake:', ':sauropod:']
 klava = [
-    ['/start', '/help'],
-    ['/img'],
-    ['/is_word', '/call_me']
-    ]
+    ['Поехали!', 'Need help'],
+    ['Дай IMG']
+]
 
 def give_knopka(update, context):
-    update.message.reply_text('fggjhfgjgjh', reply_markup=ReplyKeyboardMarkup(klava))
+    update.message.reply_text('123123123132', reply_markup=ReplyKeyboardMarkup(klava))
 
 def start(update, context):
     print('Вижу команду /start')
@@ -48,17 +47,16 @@ def talk_to_me(update, context):
 
 def img(update, context):
     arr = context.args
-    if arr == []:
-        arr.append('')
+    if not arr: # arr = [] or arr == None or arr == 0 or arr == False or arr == ''
+        arr = ['']
     for elem in arr:
         imgs = glob(f'img\*{elem}*')
         if imgs:
             img = random.choice(imgs)
             id = update.effective_chat.id
             ph = open(img, 'rb')
-            context.bot.send_photo(chat_id=id, photo=ph)
+            context.bot.send_photo(chat_id=id, photo=ph, caption=emojize(random.choice(yasherica_smiles), use_aliases=True))
             ph.close()
-            update.message.reply_text(emojize(random.choice(yasherica_smiles), use_aliases=True))
 
 
 def is_word(update, context):
@@ -80,8 +78,11 @@ def call_me(update, context):
 
 mybot.dispatcher.add_handler(CommandHandler('give_knopka', give_knopka))
 mybot.dispatcher.add_handler(CommandHandler('start', start))
+mybot.dispatcher.add_handler(MessageHandler(Filters.regex('^(Поехали!)$'), start))
 mybot.dispatcher.add_handler(CommandHandler('help', info))
+mybot.dispatcher.add_handler(MessageHandler(Filters.regex('^(Need help)$'), info))
 mybot.dispatcher.add_handler(CommandHandler('img', img))
+mybot.dispatcher.add_handler(MessageHandler(Filters.regex('^(Дай IMG)$'), img))
 mybot.dispatcher.add_handler(CommandHandler('is_word', is_word))
 mybot.dispatcher.add_handler(CommandHandler('call_me', call_me))
 # связываем функцию talk_to_me с исключительно текстовыми сообщениями
